@@ -1,0 +1,79 @@
+<!doctype html>
+<html  ng-app="switchSim">
+<head>
+  <meta charset="UTF-8">
+  <title>Example - example-ngChange-directive-production</title>
+  
+
+  <script src="js/lib/angular.min.js"></script>
+  <script src="js/lib/checklist-model.js"></script>
+
+  
+</head>
+<body>
+  <script>
+  
+  var app = angular.module('switchSim',["checklist-model"]);
+
+
+  var USER_SERVICE_API = 'http://localhost:8080/switchcontroller/';
+  
+  app.controller('SwitchSimController', function($scope, $http) {
+	  $scope.roles = [
+	    '1', 
+	    '2', 
+	    '3', 
+	    '4'
+	  ];
+	  $scope.user = {
+	    roles: []
+	  };
+	  $scope.checkAll = function() {
+	    $scope.user.roles = angular.copy($scope.roles);
+	  };
+	  $scope.uncheckAll = function() {
+	    $scope.user.roles = [];
+	  };
+
+	  $scope.getRoles = function() {
+	    return $scope.user.roles;
+	  };
+	  
+	  $scope.user.roles = angular.copy($scope.roles);
+	  
+	  $scope.check = function(value, checked) {
+	    //var idx = $scope.user.roles.indexOf(value);
+	    $scope.output = "port " + value + " is " + (checked? "up" : "down"); 
+	    
+	    /*if (idx >= 0 && !checked) {
+	      //$scope.user.roles.splice(idx, 1);
+	      $scope.confirmed = value;
+	    }
+	    if (idx < 0 && checked) {
+	      //$scope.user.roles.push(value);
+	      $scope.confirmed = value;
+	    }*/
+	    console.log('Sending request to '+ USER_SERVICE_API);
+        $http.put(USER_SERVICE_API, 
+					{},
+					{params: { port: value, status: checked}})
+        .then(
+            function (response) {
+               
+            },
+            function (errResponse) {
+                console.error('Error while sending request:'+errResponse);
+            }
+        );
+	  };
+	});
+
+</script>
+<div ng-controller="SwitchSimController">
+  	<label ng-repeat="role in roles">
+  		<input type="checkbox" checklist-model="getRoles()" checklist-value="role" ng-change="check(role, checked)"> {{role}}
+	</label>
+	<br/><tt>Event log: {{output}}</tt>
+</div>
+</body>
+</html>
