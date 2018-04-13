@@ -14,11 +14,10 @@
   <script>
   
   var app = angular.module('switchSim',["checklist-model"]);
-
-
-  var USER_SERVICE_API = 'http://159.89.115.236:8080/switchcontroller/';
+   
   
   app.controller('SwitchSimController', function($scope, $http) {
+	  
 	  $scope.roles = [
 	    '1', 
 	    '2', 
@@ -42,18 +41,11 @@
 	  $scope.user.roles = angular.copy($scope.roles);
 	  
 	  $scope.check = function(value, checked) {
-	    //var idx = $scope.user.roles.indexOf(value);
 	    $scope.output = "port " + value + " is " + (checked? "up" : "down"); 
-	    
-	    /*if (idx >= 0 && !checked) {
-	      //$scope.user.roles.splice(idx, 1);
-	      $scope.confirmed = value;
-	    }
-	    if (idx < 0 && checked) {
-	      //$scope.user.roles.push(value);
-	      $scope.confirmed = value;
-	    }*/
+
 	    console.log('Sending request to '+ USER_SERVICE_API);
+	    var USER_SERVICE_API = '/switchcontroller/';
+        
         $http.put(USER_SERVICE_API, 
 					{},
 					{params: { port: value, status: checked}})

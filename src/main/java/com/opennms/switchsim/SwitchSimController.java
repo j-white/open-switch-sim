@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,13 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SwitchSimController {
 	private SwitchSim sim = new SwitchSim();
-	public static String ipAddress = "159.89.115.236";
+	public String ipAddress;// = "127.0.0.1"; //Initialized with default, will be overwritten after (possibly)
 	public static int port = 162;
+	private static final Logger LOG = LoggerFactory.getLogger(SwitchSimController.class);
+	
+	@Autowired
+    public SwitchSimController(@Value("${opennmsserver.address}") String ipAddress) {
+        this.ipAddress = ipAddress;
+        LOG.info("OPENNMS server:" + ipAddress);
+    }
 	
 	@RequestMapping("/switchcontroller")
 	public String snmpHandler(@RequestParam("status") boolean status, @RequestParam("port") String portNum) {
 		String output = "";
 		int ifOperStatusInt = 0;
+		
+		//ipAddress = config.getOpenNMSServer();
 		
 		final InetSocketAddress trapAddr = new InetSocketAddress(ipAddress, port);
 		

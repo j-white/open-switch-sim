@@ -26,7 +26,7 @@ public class SwitchSim {
 	public String sendTrap(final InetSocketAddress trapAddr, String portNum, int ifOperStatusInt) throws UnknownHostException, IOException {
 		LOG.info("Sending trap");
 
-		LOG.info("port " + portNum + " is " + (ifOperStatusInt == 1? "up":"down") );
+		LOG.info("address:" + trapAddr.toString() + "; switch port:" + portNum + "; status: " + (ifOperStatusInt == 1? "up":"down") );
 		
 		PDU trap = new PDU();
 		trap.setType(PDU.TRAP);
