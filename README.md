@@ -1,4 +1,9 @@
-# open-switch-sim
+# Open Switch Simulator project
+
+This project simulates SNMP agent for sending traps and managing snmpwalk requests. It could be deployed using Docker. There are following components:
+
+- Switch Simulator UI (web client)
+- Mock SNMP agent (Spring Boot)
 
 Docker image is published here:
 
