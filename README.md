@@ -18,9 +18,9 @@ Just replace OPENNMSSERVER_ADDRESS argument value with your openNMS server host 
 
 ## Accessing
 
-- To access CONSOLE (UI for SpringBoot GateWay) for switch simulator: `http://123.123.123.123:8080/index.html`
+- To access **CONSOLE** (Switch Simulator UI for SpringBoot GateWay) for switch simulator: `http://123.123.123.123:8080/index.html`
 
-- SpringBoot GateWay for managing switch sim requests: `http://123.123.123.123:8080/switchcontroller/?status=1&port=1`
+- SpringBoot **GateWay** for managing switch sim requests: `http://123.123.123.123:8080/switchcontroller/?status=1&port=1`
 
 *Notes:*
 status: 1 is up, 2 is down
