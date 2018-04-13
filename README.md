@@ -7,7 +7,7 @@ This project simulates **SNMP agent** for sending traps and managing snmpwalk re
 
 Docker image is published here:
 
-https://cloud.docker.com/swarm/skochetkov/repository/docker/skochetkov/switch-sim-spring-boot-docker/general
+[Docker Hub](https://cloud.docker.com/swarm/skochetkov/repository/docker/skochetkov/switch-sim-spring-boot-docker/general)
 
 You can run it:
 ```console
@@ -20,8 +20,8 @@ Just replace OPENNMSSERVER_ADDRESS argument value with your openNMS server host 
 
 - To access CONSOLE (UI for SpringBoot GateWay) for switch simulator:
  
- http://123.123.123.123:8080/index.html
+ - http://123.123.123.123:8080/index.html
 
 - SpringBoot GateWay for managing switch sim requests:
   
-  http://123.123.123.123:8080/switchcontroller/?status=1&port=1
+ - http://123.123.123.123:8080/switchcontroller/?status=1&port=1
