@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class SwitchSimController {
 			@Value("${opennmsserver.address}") String ipAddress,
 			@Value("${opennmsserver.agentport}") int aPort,
 			@Value("${opennmsserver.cards}") int numCards, 
-			@Value("${opennmsserver.ports}") int numPortsPerCard) throws UnknownHostException, MalformedURLException, IOException {
+			@Value("${opennmsserver.ports}") int numPortsPerCard) throws UnknownHostException, MalformedURLException, IOException, InterruptedException {
 		this.ipAddress = ipAddress;
 		this.model = model;
 		model.initSwitch(numCards, numPortsPerCard);
@@ -42,6 +43,11 @@ public class SwitchSimController {
 			agentPort = aPort;
 			LOG.info("Agent default port is overwritten. New port is " + agentPort);
 		}
+		
+		//Making sure that a dump file is ready
+		LOG.info("delaying letting a dum file be ready or updated");
+		TimeUnit.SECONDS.sleep(3);
+		LOG.info("Assuming it is already ready");
 		
 		SNMPDaemon.exec(new String[] {"-d", propMibFile, "-l", "0.0.0.0", "-p", agentPort+""});
 		LOG.info("OPENNMS server:" + ipAddress + "; switch: (" + numCards + "/" + numPortsPerCard + ")");

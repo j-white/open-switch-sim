@@ -1,5 +1,6 @@
 package com.opennms.switchsim;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -95,10 +96,20 @@ public class SwitchSimModel {
 		return device;
 	}
 
-	public void initSwitch(int numCards, int numPortsPerCard) {
+	public String initSwitch(int numCards, int numPortsPerCard) {
 		device = new Switch(numCards, numPortsPerCard);
-		String mib = template.generateMib(device);
-		template.storeMib(device);
-		LOG.info("mib:"+mib);
+		//For a while we use properties to generate file
+		//String mib = template.generateMib(device);
+		String dumpFile = template.storeMib(device);
+		
+		//wait till file is ready
+    	File f = new File(dumpFile);
+    	if(f.exists() && !f.isDirectory()) { 
+    	   	LOG.info(f.getAbsolutePath() + " is ready");
+    	} else {
+    		LOG.info(f.getAbsolutePath() + " is NOT ready");
+        }
+    	
+    	return f.getAbsolutePath();
 	}
 }

@@ -184,6 +184,7 @@ public class SNMPDaemon extends BaseAgent implements Runnable{
     }*/
     public static void exec(String[] args)  throws UnknownHostException, MalformedURLException, IOException  {
     	LogFactory.setLogFactory(new ConsoleLogFactory());
+    	
         AgentConfigData agentConfig = parseCli(args);
         if (agentConfig == null) {
             System.err.println("Could not parse configuration.");
