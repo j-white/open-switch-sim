@@ -2,7 +2,7 @@
 <html  ng-app="switchSim">
 <head>
   <meta charset="UTF-8">
-  <title>Example - example-ngChange-directive-production</title>
+  <title>Open Console - Switch Simulator UI </title>
   
 
   <script src="js/lib/angular.min.js"></script>
@@ -17,13 +17,29 @@
    
   
   app.controller('SwitchSimController', function($scope, $http) {
+	  var INVENTORY_API = '/inventory';
+	  var request = {
+			  method: 'get',
+			  url: INVENTORY_API,
+			  dataType: 'json',
+			  contentType: "application/json"
+	  }
 	  
-	  $scope.roles = [
-	    '1', 
-	    '2', 
-	    '3', 
-	    '4'
-	  ];
+	  $scope.arrSwitch = new Array;
+	  
+	  
+	  
+	  $http(request)
+	  	.success(function (jsonData) {
+		  $scope.arrSwitch = jsonData;
+		  $scope.roles = $scope.arrSwitch;
+		  console.log(jsonData);
+		  console.log($scope.roles);
+	  	})
+	  	.error(function () {
+	  		
+	  	});
+	  
 	  $scope.user = {
 	    roles: []
 	  };
@@ -41,9 +57,10 @@
 	  $scope.user.roles = angular.copy($scope.roles);
 	  
 	  $scope.check = function(value, checked) {
+		console.log(value);
 	    $scope.output = "port " + value + " is " + (checked? "up" : "down"); 
 
-	    console.log('Sending request to '+ USER_SERVICE_API);
+	   //console.log('Sending request to '+ USER_SERVICE_API);
 	    var USER_SERVICE_API = '/switchcontroller/';
         
         $http.put(USER_SERVICE_API, 
@@ -56,14 +73,20 @@
             function (errResponse) {
                 console.error('Error while sending request:'+errResponse);
             }
-        );
-	  };
+	     );
+	   };
 	});
 
 </script>
 <div ng-controller="SwitchSimController">
-  	<label ng-repeat="role in roles">
-  		<input type="checkbox" checklist-model="getRoles()" checklist-value="role" ng-change="check(role, checked)"> {{role}}
+	<label ng-repeat="card in roles.cards">
+		<label ng-repeat="port in card.ports">
+
+  			<input type="checkbox" checklist-model="getRoles()" checklist-value="role" ng-change="check(port.portID, checked)"> {{
+  			port.portID;
+  			}}
+  		</label>
+  		<br/>
 	</label>
 	<br/><tt>Event log: {{output}}</tt>
 </div>

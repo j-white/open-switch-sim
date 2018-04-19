@@ -19,41 +19,50 @@ import org.snmp4j.smi.TimeTicks;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import com.opennms.switchsim.model.Switch;
 
-public class SwitchSim {
-	private static final Logger LOG = LoggerFactory.getLogger(SwitchSim.class);
+@Component
+public class SwitchSimModel {
+	private static final Logger LOG = LoggerFactory.getLogger(SwitchSimModel.class);
+	private Switch device;
+	@Autowired
+	private SwitchSimTemplateUtils template;
 	
-	public String sendTrap(final InetSocketAddress trapAddr, String portNum, int ifOperStatusInt) throws UnknownHostException, IOException {
+	public String sendTrap(final InetSocketAddress trapAddr, String portNum, int ifOperStatusInt)
+			throws UnknownHostException, IOException {
 		LOG.info("Sending trap");
 
-		LOG.info("address:" + trapAddr.toString() + "; switch port:" + portNum + "; status: " + (ifOperStatusInt == 1? "up":"down") );
-		
+		LOG.info("address:" + trapAddr.toString() + "; switch port:" + portNum + "; status: "
+				+ (ifOperStatusInt == 1 ? "up" : "down"));
+
 		PDU trap = new PDU();
 		trap.setType(PDU.TRAP);
-		
-		//The first varbind must be sysUpTime.0 and the second snmpTrapOID.0
+
+		// The first varbind must be sysUpTime.0 and the second snmpTrapOID.0
 		OID oid;
-		
-		if(ifOperStatusInt == 2)
+
+		if (ifOperStatusInt == 2)
 			oid = new OID(".1.3.6.1.6.3.1.1.5.3");
 		else
 			oid = new OID(".1.3.6.1.6.3.1.1.5.4");
-		
-		trap.add(new VariableBinding(SnmpConstants.sysUpTime, new TimeTicks(0))); 
+
+		trap.add(new VariableBinding(SnmpConstants.sysUpTime, new TimeTicks(0)));
 		trap.add(new VariableBinding(SnmpConstants.snmpTrapOID, oid));
-		//trap.add(new VariableBinding(SnmpConstants.sysDescr, new OctetString("System Description"))); 
-		//trap.add(new VariableBinding(SnmpConstants.snmpTrapAddress, new IpAddress(trapAddr.getAddress())));
-		//trap.add(new VariableBinding(oid, new OctetString("some string")));     
-		
+		// trap.add(new VariableBinding(SnmpConstants.sysDescr, new OctetString("System
+		// Description")));
+		// trap.add(new VariableBinding(SnmpConstants.snmpTrapAddress, new
+		// IpAddress(trapAddr.getAddress())));
+		// trap.add(new VariableBinding(oid, new OctetString("some string")));
+
 		OID ifIndex = new OID("1.3.6.1.2.1.2.2.1.1");
 		OID isAdminStatus = new OID("1.3.6.1.2.1.2.2.1.7");
 		OID ifOperStatus = new OID("1.3.6.1.2.1.2.2.1.8");
-		
+
 		trap.add(new VariableBinding(ifIndex, new Integer32(Integer.parseInt(portNum))));
 		trap.add(new VariableBinding(isAdminStatus, new Integer32(1)));
 		trap.add(new VariableBinding(ifOperStatus, new Integer32(ifOperStatusInt)));
-	
-		
 
 		// Specify receiver
 		Address targetaddress = new UdpAddress(trapAddr.getAddress(), trapAddr.getPort());
@@ -62,19 +71,34 @@ public class SwitchSim {
 		target.setCommunity(new OctetString("public"));
 		target.setVersion(SnmpConstants.version2c);
 		target.setAddress(targetaddress);
-		
+
 		// Send
 		Snmp snmp = new Snmp(new DefaultUdpTransportMapping());
-		snmp.send(trap, target, null, null);    
-		
+		snmp.send(trap, target, null, null);
+
 		ResponseEvent event = snmp.send(trap, target, null);
-		
-		if(event != null) {
+
+		if (event != null) {
 			LOG.info(event.toString());
 		}
 
 		LOG.info("Trap has been sent");
-        return "success";
+		return "success";
 	}
 
+	public Switch getSwitch() {
+		//If a device is not initialized yet, init it with default values
+		if(device == null) {
+			device = new Switch();
+		}
+		
+		return device;
+	}
+
+	public void initSwitch(int numCards, int numPortsPerCard) {
+		device = new Switch(numCards, numPortsPerCard);
+		String mib = template.generateMib(device);
+		template.storeMib(device);
+		LOG.info("mib:"+mib);
+	}
 }

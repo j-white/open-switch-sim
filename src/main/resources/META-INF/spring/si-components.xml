@@ -1,0 +1,18 @@
+<beans
+xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:int="http://www.springframework.org/schema/integration"
+xmlns:int-stream="http://www.springframework.org/schema/integration/stream" xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/integration
+http://www.springframework.org/schema/integration/springintegration.xsd
+http://www.springframework.org/schema/integration/stream
+http://www.springframework.org/schema/integration/stream/springintegration-stream.xsd">
+   <!-- int-ip:udp-outbound-channel-adapter id="udpOut"
+    host="somehost"
+    port="11111"
+    multicast="false"
+    check-length="true"
+    channel="exampleChannel"/-->
+</beans>
