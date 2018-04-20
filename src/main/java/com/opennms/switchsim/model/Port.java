@@ -2,7 +2,7 @@ package com.opennms.switchsim.model;
 
 public class Port {
 	private Number portID;
-	private Boolean isLinkDown;
+	private Boolean isLinkDown = false;
 	
 	public Port() {
 		
@@ -22,5 +22,9 @@ public class Port {
 
 	public Boolean isLinkDown() {
 		return isLinkDown;
+	}
+	
+	public void setLinkDown(Boolean isLinkDown) {
+		this.isLinkDown = isLinkDown;
 	}
 }

@@ -108,7 +108,7 @@ public class SwitchSimTemplateUtils {
 
 			for (Card card : cards) {
 				for (Port port : card.getPorts()) {
-					prop.setProperty(".1.3.6.1.2.1.2.2.1.8." + port.getPortID(), "INTEGER: 1");
+					prop.setProperty(".1.3.6.1.2.1.2.2.1.8." + port.getPortID(), "Responder: com.opennms.switchsim.daemon.responder.OperStatus");
 				}
 			}
 

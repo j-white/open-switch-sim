@@ -20,23 +20,33 @@ import org.snmp4j.smi.TimeTicks;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.opennms.switchsim.model.OperStatusEnum;
 import com.opennms.switchsim.model.Switch;
 
 @Component
 public class SwitchSimModel {
 	private static final Logger LOG = LoggerFactory.getLogger(SwitchSimModel.class);
 	private Switch device;
-	@Autowired
-	private SwitchSimTemplateUtils template;
+	private SwitchSimTemplateUtils template = new SwitchSimTemplateUtils();
+	private static SwitchSimModel model;
+	
+	private SwitchSimModel() {}
+	
+	public static SwitchSimModel getInstance() {
+		if(model == null)
+			model = new SwitchSimModel();
+		
+		return model;
+	}
 	
 	public String sendTrap(final InetSocketAddress trapAddr, String portNum, int ifOperStatusInt)
 			throws UnknownHostException, IOException {
 		LOG.info("Sending trap");
 
 		LOG.info("address:" + trapAddr.toString() + "; switch port:" + portNum + "; status: "
-				+ (ifOperStatusInt == 1 ? "up" : "down"));
+				+ (ifOperStatusInt == OperStatusEnum.LINK_UP.getValue() ? "up" : "down"));
 
 		PDU trap = new PDU();
 		trap.setType(PDU.TRAP);
@@ -88,11 +98,6 @@ public class SwitchSimModel {
 	}
 
 	public Switch getSwitch() {
-		//If a device is not initialized yet, init it with default values
-		if(device == null) {
-			device = new Switch();
-		}
-		
 		return device;
 	}
 

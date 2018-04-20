@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.opennms.switchsim.daemon.SNMPDaemon;
+import com.opennms.switchsim.model.Card;
+import com.opennms.switchsim.model.OperStatusEnum;
+import com.opennms.switchsim.model.Port;
 import com.opennms.switchsim.model.Switch;
 
 @RestController
 public class SwitchSimController {
-	private SwitchSimModel model;
 	public String ipAddress;// = "127.0.0.1"; //Initialized with default, will be overwritten after
 	public static int port = 162;
 	public static int agentPort = 161;
@@ -35,8 +37,7 @@ public class SwitchSimController {
 			@Value("${opennmsserver.cards}") int numCards, 
 			@Value("${opennmsserver.ports}") int numPortsPerCard) throws UnknownHostException, MalformedURLException, IOException, InterruptedException {
 		this.ipAddress = ipAddress;
-		this.model = model;
-		model.initSwitch(numCards, numPortsPerCard);
+		SwitchSimModel.getInstance().initSwitch(numCards, numPortsPerCard);
 		
 		//Override default agent port if a new value provided
 		if(agentPort != aPort) {
@@ -54,7 +55,7 @@ public class SwitchSimController {
 	}
 
 	@RequestMapping("/switchcontroller")
-	public String snmpHandler(@RequestParam("status") boolean status, @RequestParam("port") String portNum) {
+	public void snmpHandler(@RequestParam("status") boolean status, @RequestParam("port") String portNum) {
 		String output = "";
 		int ifOperStatusInt = 0;
 
@@ -63,10 +64,18 @@ public class SwitchSimController {
 		final InetSocketAddress trapAddr = new InetSocketAddress(ipAddress, port);
 
 		// just simple validation to exclude noisy values
-		ifOperStatusInt = (status ? 1 : 2);
+		ifOperStatusInt = (status ? OperStatusEnum.LINK_UP.getValue() : OperStatusEnum.LINK_DOWN.getValue());
+		
+		for (Card card : SwitchSimModel.getInstance().getSwitch().getCards()) {
+			for (Port port : card.getPorts()) {
+				if(port.getPortID().intValue() == Integer.parseInt(portNum)) {
+					port.setLinkDown(status);
+				}
+			}
+		}
 
 		try {
-			output = model.sendTrap(trapAddr, portNum, ifOperStatusInt);
+			output = SwitchSimModel.getInstance().sendTrap(trapAddr, portNum, ifOperStatusInt);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,12 +84,10 @@ public class SwitchSimController {
 			e.printStackTrace();
 		}
 
-		// and display message to client
-		return "port " + portNum + " is " + (ifOperStatusInt == 1 ? "up" : "down") + "\n output:\n" + output;
 	}
 
 	@GetMapping(path = "/inventory", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Switch loadInventory() {
-		return model.getSwitch();
+		return SwitchSimModel.getInstance().getSwitch();
 	}
 }
