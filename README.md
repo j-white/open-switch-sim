@@ -11,7 +11,7 @@ Docker image is published here:
 
 You can run it:
 ```console
-$ docker run -e OPENNMSSERVER_ADDRESS='123.123.123.123' OPENNMSSERVER_AGENTPORT=161 OPENNMSSERVER_CARDS=4 OPENNMSSERVER_PORTS=8 -p 8080:8080  -t skochetkov/switch-sim-spring-boot-docker
+$ docker run -e OPENNMSSERVER_ADDRESS='123.123.123.123' -e OPENNMSSERVER_AGENTPORT=161 -e OPENNMSSERVER_CARDS=4 -e OPENNMSSERVER_PORTS=8 -p 8080:8080  -t skochetkov/switch-sim-spring-boot-docker
 ```
 *Notes:*
 
