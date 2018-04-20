@@ -1,0 +1,89 @@
+<!doctype html>
+<html  ng-app="switchSim">
+<head>
+  <meta charset="UTF-8">
+  <title>Open Console - Switch Simulator UI </title>
+  <script src="js/lib/angular.min.js"></script>
+</head>
+<body>
+	<style>
+		input[type=checkbox] {
+		  transform: scale(1.6);
+		}
+
+	</style>
+  	<script>
+  
+  var app = angular.module('switchSim',[]);
+  
+  app.controller('SwitchSimController', function($scope, $http) {
+	  var INVENTORY_API = '/inventory';
+	  var USER_SERVICE_API = '/switchcontroller/';
+	  
+	  var request = {
+			  method: 'get',
+			  url: INVENTORY_API,
+			  dataType: 'json',
+			  contentType: "application/json"
+	  }
+	  
+	  $scope.arrSwitch = new Array;
+	  $scope.cardCounter = 1;
+	  
+	  $http(request)
+	  	.success(function (jsonData) {
+	  		console.log(jsonData);
+	  	  	$scope.arrSwitch = jsonData;
+		  	//$scope.switchSimArr = $scope.arrSwitch;
+		})
+	  	.error(function () {
+	  		console.log('Error in getting inventory');
+	  	});
+
+	  
+	  $scope.checkPort = function(port, checked) {
+		//console.log("value changed: " + port.portID + ":" + checked);
+		if(angular.isUndefined(checked) || checked === null)
+			checked = false;
+		console.log("value changed: " + port.portID + ":" + checked);
+		$scope.output = "port " + port.portID + " is " + (checked? "up" : "down"); 
+
+	    
+	   console.log('Sending request to '+ USER_SERVICE_API);
+	    
+        
+        $http.put(USER_SERVICE_API, 
+					{},
+					{params: { "port": port.portID, "status": !checked}})
+        .then(
+            function (response) {
+               console.log(response);
+            },
+            function (errResponse) {
+            	
+                console.error('Error while sending request:'+errResponse);
+            }
+	     );
+	   };
+	});
+
+</script>
+<div ng-controller="SwitchSimController">
+	<label ng-repeat="card in arrSwitch.cards" style="box-sizing:border-box; border-style: ridge; border-color: grey; boder-width: 1px; background-color:#e6e6ff "> 
+		<label ng-repeat="port in card.ports" style='font-size: 14px; padding: 5px; margin: 5px; font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;'>
+  			<input type="checkbox" 
+		  			name="selectedPorts[]"
+				    value="{{port.portID}}"
+				    ng-model="check"
+				    ng-checked="!port.linkDown"
+				    ng-click="checkPort(port, check)">
+    	&nbsp;{{
+  			(port.portID < 10)? '0'+port.portID : port.portID
+  			}}
+  		</label>
+  		<br/><br/>
+	</label>
+	<br/><tt>Event log: {{output}}</tt>
+</div>
+</body>
+</html>
